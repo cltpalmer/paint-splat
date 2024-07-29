@@ -41,3 +41,20 @@ body {
     font-size: 20px;
     cursor: pointer;
 }
+
+#colorPalette {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 10px;
+}
+
+.colorOption {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    cursor: pointer;
+}
