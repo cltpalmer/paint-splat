@@ -9,13 +9,24 @@ const brushSize = 20;
 const eraseInterval = 500; // Erase every 500ms
 let remainingTime = 30;
 let gameStarted = false;
+let currentColor = '#FFB6C1'; // Default color
 
 const startButton = document.getElementById('startButton');
 startButton.addEventListener('click', startGame);
 
+const colorOptions = document.querySelectorAll('.colorOption');
+colorOptions.forEach(option => {
+    option.addEventListener('click', () => {
+        currentColor = option.getAttribute('data-color');
+        colorOptions.forEach(opt => opt.style.border = '2px solid #000'); // Reset border
+        option.style.border = '2px solid #FFF'; // Highlight selected color
+    });
+});
+
 function startGame() {
     gameStarted = true;
     startButton.style.display = 'none';
+    document.getElementById('colorPalette').style.display = 'none';
     document.getElementById('timer').innerText = `Time: ${remainingTime}`;
     document.getElementById('score').innerText = `Score: ${score}`;
     
@@ -44,6 +55,7 @@ function endGame() {
     canvas.removeEventListener('mousemove', draw);
     gameStarted = false;
     startButton.style.display = 'block';
+    document.getElementById('colorPalette').style.display = 'flex';
     remainingTime = 30;
     score = 0;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -54,7 +66,7 @@ function draw(e) {
     
     ctx.lineWidth = brushSize;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = 'red';
+    ctx.strokeStyle = currentColor;
     
     ctx.lineTo(e.offsetX, e.offsetY);
     ctx.stroke();
