@@ -6,7 +6,7 @@ canvas.height = canvas.offsetHeight;
 let painting = false;
 let score = 0;
 const brushSize = 20;
-const eraseInterval = 500; // Erase every 500ms
+let eraseInterval = 500; // Initial erase interval
 let remainingTime = 30;
 let gameStarted = false;
 let currentColor = '#FFB6C1'; // Default color
@@ -36,10 +36,12 @@ function startGame() {
         if (remainingTime <= 0) {
             clearInterval(timer);
             endGame();
+        } else if (remainingTime % 5 === 0) {
+            eraseInterval = Math.max(100, eraseInterval - 50); // Speed up every 5 seconds
         }
     }, 1000);
 
-    const eraser = setInterval(() => {
+    let eraser = setInterval(() => {
         if (remainingTime > 0) {
             eraseRandomSpot();
         } else {
@@ -58,6 +60,7 @@ function endGame() {
     document.getElementById('colorPalette').style.display = 'flex';
     remainingTime = 30;
     score = 0;
+    eraseInterval = 500; // Reset erase interval
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -79,9 +82,15 @@ function draw(e) {
 function eraseRandomSpot() {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const size = brushSize * 2;
-    
-    ctx.clearRect(x, y, size, size);
+    const radius = brushSize;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+    ctx.clip();
+    ctx.clearRect(x - radius, y - radius, radius * 2, radius * 2);
+    ctx.restore();
+
     updateScore();
 }
 
