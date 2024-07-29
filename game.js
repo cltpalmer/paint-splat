@@ -8,8 +8,14 @@ let score = 0;
 const brushSize = 20;
 const eraseInterval = 500; // Erase every 500ms
 let remainingTime = 30;
+let gameStarted = false;
+
+const startButton = document.getElementById('startButton');
+startButton.addEventListener('click', startGame);
 
 function startGame() {
+    gameStarted = true;
+    startButton.style.display = 'none';
     document.getElementById('timer').innerText = `Time: ${remainingTime}`;
     document.getElementById('score').innerText = `Score: ${score}`;
     
@@ -29,32 +35,31 @@ function startGame() {
             clearInterval(eraser);
         }
     }, eraseInterval);
+
+    canvas.addEventListener('mousemove', draw);
 }
 
 function endGame() {
     alert(`Time's up! Your final score is: ${score}`);
-}
-
-function startPosition(e) {
-    painting = true;
-    draw(e);
-}
-
-function finishedPosition() {
-    painting = false;
-    ctx.beginPath();
+    canvas.removeEventListener('mousemove', draw);
+    gameStarted = false;
+    startButton.style.display = 'block';
+    remainingTime = 30;
+    score = 0;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function draw(e) {
-    if (!painting) return;
+    if (!gameStarted) return;
+    
     ctx.lineWidth = brushSize;
     ctx.lineCap = 'round';
     ctx.strokeStyle = 'red';
     
-    ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+    ctx.lineTo(e.offsetX, e.offsetY);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+    ctx.moveTo(e.offsetX, e.offsetY);
     
     updateScore();
 }
@@ -80,8 +85,6 @@ function updateScore() {
     document.getElementById('score').innerText = `Score: ${score}`;
 }
 
-canvas.addEventListener('mousedown', startPosition);
-canvas.addEventListener('mouseup', finishedPosition);
-canvas.addEventListener('mousemove', draw);
-
-startGame();
+canvas.addEventListener('mouseleave', () => {
+    ctx.beginPath();
+});
